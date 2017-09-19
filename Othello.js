@@ -25,26 +25,31 @@ var state = {
 }  
 
 /** @function updateScore
-  * helper function which updates the score field in the state variable
+  * helper function which updates the score and over fields in the state variable
   */
-function updateScore (){
+function updateState (){
 	var countW = 0;
 	var countB = 0;
 	for(var y = 0; y < state.board.length; y++){
 		for(var y = 0; y < state.board[y].length; y++){
-			switch(state.board[y][x]){
-				case 'w': 
-					countW ++;
+			if(state.board[y][x]){
+				switch(state.board[y][x]){
+					case 'w': 
+						countW ++;
+						break;
+					case 'b':
+						countB ++;
+						break;
+					default:
 					break;
-				case 'b':
-					countW ++;
-					break;
-				default:
-				break;
+				}
 			}
 		}
 	}
 	state.score = {w: countW, b: countB};
+	if(countW+countB === 64){
+		state.over = true;
+	}
 }
 
 
@@ -367,3 +372,116 @@ funtion applyLeft(x,y, depth){
 		return false;
 }
 
+/** @function nextTurn()
+  * Starts the next turn by changing the turn property of state.
+  */
+function nextTurn() {
+  if(state.turn === 'b') state.turn = 'w';
+  else state.turn = 'b';
+}
+
+/**
+  * @function updateBoard
+  * updates the board
+  */
+function updateBoard(){
+	
+		for(var y = 0; y < state.board.length; y++){
+			for(var x = 0; x < state.board[y].length; x++){
+				if(state.board[y][x]) {
+					var square = getElementById("square-" + x + "-" + y)
+					square.removeChild(square.lastChild);
+					var tile = document.createElement('div');
+					tile.classList.add('tile');
+					tile.classList.add('tile-' + state.board[y][x]);
+					square.appendChild(tile);
+				}
+			}
+		}	
+}
+
+/** @function clearHighlights
+  * Clears all highligted squares
+  */
+function clearHighlights() {
+  var highlighted = document.querySelectorAll('.highlight');
+  highlighted.forEach(function(square){
+    square.classList.remove('highlight');
+  });
+}
+
+/** @function handleCheckerClick
+  * Click handler for checker
+  */
+function handleSquareClick(event) {
+  event.preventDefault();
+  var squareId = event.target.id;
+  var x = parseInt(squareId.charAt(7));
+  var y = parseInt(squareId.charAt(9));
+  var piece = state.board[y][x];
+  // Clear old highlights
+  clearHighlights();
+  // Make sure the checker is the player's
+  if(piece.charAt(0) !== state.turn) return;
+  // Get legal moves
+  var moves = getLegalMoves(state.board[y][x], x, y);
+  // mark checker to move
+  event.target.classList.add('highlight');
+  // Mark squares available for moves
+  moves.forEach(function(move){
+    if(move.type === 'slide') {
+      var square = document.getElementById('square-' + move.x + '-' + move.y);
+      square.classList.add('highlight');
+    }
+  })
+}
+
+/** @function setup
+  * Sets up the game environment
+  */
+function setup() {
+	var board = document.createElement('section');
+	board.id = 'game-board';
+	document.body.appendChild(board);
+	for(var y = 0; y < state.board.length; y++){
+		for(var x = 0; x < state.board[y].length; x++){
+		  var square = document.createElement('div');
+		  square.id = "square-" + x + "-" + y;
+		  square.classList.add('square');
+		  if((y+x) % 2 === 1) square.classList.add('black');
+		  square.onclick = handleSquareClick;
+		  board.appendChild(square);
+		  if(state.board[y][x]) {
+			var tile = document.createElement('div');
+			tile.classList.add('tile');
+			tile.classList.add('tile-' + state.board[y][x]);
+			square.appendChild(tile);
+		  }
+		}
+	} 
+}
+
+function main(){
+	setup();
+	while(!state.over){
+		while(state.turn === 'b'){
+			//waits for user input through square click event handler 
+		};
+		if(!state.over){
+			var moves = getLegalMoves();
+			if (moves.length > 0){
+				applyMove(moves.pop());
+				updateState();
+				updateBoard();
+			}
+			nextTurn();
+		}
+		if(state.over){
+			if(state.score.w > state.score.b) alert("The Computer has won with a score of W: "+state.score.w+" to B: "+state.score.b);
+			else if(state.score.w > state.score.b) alert("You have won with a score of B: "+state.score.b+" to W: "+state.score.w);
+			else alert("There has been a tie with a score of B: "+state.score.b+" to W: "+state.score.w);
+		}
+		else alert("The score is B: "+state.score.b+" to W: "+state.score.w);
+	}
+}
+main();
