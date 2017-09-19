@@ -47,6 +47,9 @@ function updateScore (){
 	state.score = {w: countW, b: countB};
 }
 
+
+
+
 /** @function getLegalMoves
   * returns the coordinates of all locations the player whose turn it is can place their tile.
   * @returns {Array} the coordinates the next move can be played in, along with the number of pieces they flip.
@@ -69,7 +72,8 @@ function getLegalMoves (){
 			}
 		}
 	}
-	return moves;
+	moves.sort(function(a, b){return a.tiles - b.tiles});
+	return moves.reverse();
 }
 
 /**
@@ -80,7 +84,7 @@ function getLegalMoves (){
   * @param {integer} depth - distance from calling location
   * @returns the number of tiles flipped by going that direction
   */
-checkUpLeft(x, y, depth){
+function checkUpLeft(x, y, depth){
 	if(x < 0 || x > 9 || y < 0 || y > 9) return 0;//ensures we're still on the board
 	if(depth > 0 && !state.board[y][x]) return 0;
 	if(state.board[y][x] === state.turn) return depth-1;
@@ -96,7 +100,7 @@ checkUpLeft(x, y, depth){
   * @param {integer} depth - distance from calling location
   * @returns the number of tiles flipped by going that direction
   */
-checkUp(x, y, depth){
+function checkUp(x, y, depth){
 	if(x < 0 || x > 9 || y < 0 || y > 9) return 0;//ensures we're still on the board
 	if(depth > 0 && !state.board[y][x]) return 0;
 	if(state.board[y][x] === state.turn) return depth-1;
@@ -111,7 +115,7 @@ checkUp(x, y, depth){
   * @param {integer} depth - distance from calling location
   * @returns the number of tiles flipped by going that direction
   */
-checkUpRight(x, y, depth){
+function checkUpRight(x, y, depth){
 	if(x < 0 || x > 9 || y < 0 || y > 9) return 0;//ensures we're still on the board
 	if(depth > 0 && !state.board[y][x]) return 0;
 	if(state.board[y][x] === state.turn) return depth-1;
@@ -126,7 +130,7 @@ checkUpRight(x, y, depth){
   * @param {integer} depth - distance from calling location
   * @returns the number of tiles flipped by going that direction
   */
-checkRight(x, y, depth){
+function checkRight(x, y, depth){
 	if(x < 0 || x > 9 || y < 0 || y > 9) return 0;//ensures we're still on the board
 	if(depth > 0 && !state.board[y][x]) return 0;
 	if(state.board[y][x] === state.turn) return depth-1;
@@ -141,7 +145,7 @@ checkRight(x, y, depth){
   * @param {integer} depth - distance from calling location
   * @returns the number of tiles flipped by going that direction
   */
-checkDownRight(x, y, depth){
+function checkDownRight(x, y, depth){
 	if(x < 0 || x > 9 || y < 0 || y > 9) return 0;//ensures we're still on the board
 	if(depth > 0 && !state.board[y][x]) return 0;
 	if(state.board[y][x] === state.turn) return depth-1;
@@ -156,7 +160,7 @@ checkDownRight(x, y, depth){
   * @param {integer} depth - distance from calling location
   * @returns the number of tiles flipped by going that direction
   */
-checkDown(x, y, depth){
+function checkDown(x, y, depth){
 	if(x < 0 || x > 9 || y < 0 || y > 9) return 0;//ensures we're still on the board
 	if(depth > 0 && !state.board[y][x]) return 0;
 	if(state.board[y][x] === state.turn) return depth-1;
@@ -171,7 +175,7 @@ checkDown(x, y, depth){
   * @param {integer} depth - distance from calling location
   * @returns the number of tiles flipped by going that direction
   */
-checkDownLeft(x, y, depth){
+function checkDownLeft(x, y, depth){
 	if(x < 0 || x > 9 || y < 0 || y > 9) return 0;//ensures we're still on the board
 	if(depth > 0 && !state.board[y][x]) return 0;
 	if(state.board[y][x] === state.turn) return depth-1;
@@ -186,9 +190,180 @@ checkDownLeft(x, y, depth){
   * @param {integer} depth - distance from calling location
   * @returns the number of tiles flipped by going that direction
   */
-CheckLeft(x, y, depth){
+function CheckLeft(x, y, depth){
 	if(x < 0 || x > 9 || y < 0 || y > 9) return 0;//ensures we're still on the board
 	if(depth > 0 && !state.board[y][x]) return 0;
 	if(state.board[y][x] === state.turn) return depth-1;
 	return checkUpLeft(x-1,y, depth+1);	
 }
+
+
+
+/**
+  * @function applyMove
+  * applies a move
+  * @param {object} move - applies the moved passed in for state.turn
+  */
+function applyMove (move){
+	applyUpLeft{move.x, move.y, 0};
+	applyUp{move.x, move.y, 0};
+	applyUpRight{move.x, move.y, 0};
+	applyRight{move.x, move.y, 0};
+	applyDownRight{move.x, move.y, 0};
+	applyDown{move.x, move.y, 0};
+	applyDownLeft{move.x, move.y, 0};
+	applyLeft{move.x, move.y, 0};
+}
+
+/**
+  * @function applyUpLeft
+  * recursively flips tiles in a direction
+  * @param {integer} x - x coordinate on board
+  * @param {integer} y - y coordinate on board
+  * @param {integer} depth - distance from calling location
+  * @returns boolean of if flipped in direction
+  */
+funtion applyUpLeft(x,y, depth){
+	if(x < 0 || x > 9 || y < 0 || y > 9) return false;//ensures we're still on the board
+	if(depth > 0 && !state.board[y][x]) return false;
+	if(state.board[y][x] === state.turn) return true;
+	if (checkUpLeft(x-1,y-1, depth+1)){
+			state.board[y][x] = state.turn;
+			return true;
+		}
+		return false;
+}
+
+/**
+  * @function applyUp
+  * recursively flips tiles in a direction
+  * @param {integer} x - x coordinate on board
+  * @param {integer} y - y coordinate on board
+  * @param {integer} depth - distance from calling location
+  * @returns boolean of if flipped in direction
+  */
+funtion applyUp(x,y, depth){
+	if(x < 0 || x > 9 || y < 0 || y > 9) return false;//ensures we're still on the board
+	if(depth > 0 && !state.board[y][x]) return false;
+	if(state.board[y][x] === state.turn) return true;
+	if (checkUpLeft(x,y-1, depth+1)){
+			state.board[y][x] = state.turn;
+			return true;
+		}
+		return false;
+}
+
+/**
+  * @function applyUpRight
+  * recursively flips tiles in a direction
+  * @param {integer} x - x coordinate on board
+  * @param {integer} y - y coordinate on board
+  * @param {integer} depth - distance from calling location
+  * @returns boolean of if flipped in direction
+  */
+funtion applyUpRight(x,y, depth){
+	if(x < 0 || x > 9 || y < 0 || y > 9) return false;//ensures we're still on the board
+	if(depth > 0 && !state.board[y][x]) return false;
+	if(state.board[y][x] === state.turn) return true;
+	if (checkUpLeft(x+1,y-1, depth+1)){
+			state.board[y][x] = state.turn;
+			return true;
+		}
+		return false;
+}
+
+/**
+  * @function applyRight
+  * recursively flips tiles in a direction
+  * @param {integer} x - x coordinate on board
+  * @param {integer} y - y coordinate on board
+  * @param {integer} depth - distance from calling location
+  * @returns boolean of if flipped in direction
+  */
+funtion applyRight(x,y, depth){
+	if(x < 0 || x > 9 || y < 0 || y > 9) return false;//ensures we're still on the board
+	if(depth > 0 && !state.board[y][x]) return false;
+	if(state.board[y][x] === state.turn) return true;
+	if (checkUpLeft(x+1,y, depth+1)){
+			state.board[y][x] = state.turn;
+			return true;
+		}
+		return false;
+}
+
+/**
+  * @function applyDownRight
+  * recursively flips tiles in a direction
+  * @param {integer} x - x coordinate on board
+  * @param {integer} y - y coordinate on board
+  * @param {integer} depth - distance from calling location
+  * @returns boolean of if flipped in direction
+  */
+funtion applyDownRight(x,y, depth){
+	if(x < 0 || x > 9 || y < 0 || y > 9) return false;//ensures we're still on the board
+	if(depth > 0 && !state.board[y][x]) return false;
+	if(state.board[y][x] === state.turn) return true;
+	if (checkUpLeft(x+1,y+1, depth+1)){
+			state.board[y][x] = state.turn;
+			return true;
+		}
+		return false;
+}
+
+/**
+  * @function applyDown
+  * recursively flips tiles in a direction
+  * @param {integer} x - x coordinate on board
+  * @param {integer} y - y coordinate on board
+  * @param {integer} depth - distance from calling location
+  * @returns boolean of if flipped in direction
+  */
+funtion applyDown(x,y, depth){
+	if(x < 0 || x > 9 || y < 0 || y > 9) return false;//ensures we're still on the board
+	if(depth > 0 && !state.board[y][x]) return false;
+	if(state.board[y][x] === state.turn) return true;
+	if (checkUpLeft(x,y+1, depth+1)){
+			state.board[y][x] = state.turn;
+			return true;
+		}
+		return false;
+}
+
+/**
+  * @function applyDownLeft
+  * recursively flips tiles in a direction
+  * @param {integer} x - x coordinate on board
+  * @param {integer} y - y coordinate on board
+  * @param {integer} depth - distance from calling location
+  * @returns boolean of if flipped in direction
+  */
+funtion applyDownLeft(x,y, depth){
+	if(x < 0 || x > 9 || y < 0 || y > 9) return false;//ensures we're still on the board
+	if(depth > 0 && !state.board[y][x]) return false;
+	if(state.board[y][x] === state.turn) return true;
+	if (checkUpLeft(x-1,y+1, depth+1)){
+			state.board[y][x] = state.turn;
+			return true;
+		}
+		return false;
+}
+
+/**
+  * @function applyLeft
+  * recursively flips tiles in a direction
+  * @param {integer} x - x coordinate on board
+  * @param {integer} y - y coordinate on board
+  * @param {integer} depth - distance from calling location
+  * @returns boolean of if flipped in direction
+  */
+funtion applyLeft(x,y, depth){
+	if(x < 0 || x > 9 || y < 0 || y > 9) return false;//ensures we're still on the board
+	if(depth > 0 && !state.board[y][x]) return false;
+	if(state.board[y][x] === state.turn) return true;
+	if (checkUpLeft(x-1,y, depth+1)){
+			state.board[y][x] = state.turn;
+			return true;
+		}
+		return false;
+}
+
