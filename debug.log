@@ -1,0 +1,4 @@
+[0920/002701.383:ERROR:process_info.cc(632)] range at 0xe466349000000000, size 0x1e7 fully unreadable
+[0920/002701.386:ERROR:process_info.cc(632)] range at 0xe46634f800000000, size 0x1e7 fully unreadable
+[0920/002701.386:ERROR:process_info.cc(632)] range at 0x0, size 0x1e7 fully unreadable
+[0920/002701.762:ERROR:process_info.cc(396)] NtQuerySystemInformation SystemExtendedHandleInformation: The specified information record length does not match the length required for the specified information class.  (0xc0000004)

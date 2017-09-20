@@ -21,7 +21,8 @@ var state = {
 	[null,null,null,null,null,null,null,null],
 	[null,null,null,null,null,null,null,null],
 	],
-	score: {w: 2, b: 2}
+	score: {w: 2, b: 2},
+	bMoves: []
 }  
 
 /** @function updateScore
@@ -31,7 +32,7 @@ function updateState (){
 	var countW = 0;
 	var countB = 0;
 	for(var y = 0; y < state.board.length; y++){
-		for(var y = 0; y < state.board[y].length; y++){
+		for(var x = 0; x < state.board[y].length; x++){
 			if(state.board[y][x]){
 				switch(state.board[y][x]){
 					case 'w': 
@@ -210,14 +211,15 @@ function checkLeft(x, y, depth){
   * @param {object} move - applies the moved passed in for state.turn
   */
 function applyMove (move){
-	applyUpLeft(move.x, move.y, 0);
-	applyUp(move.x, move.y, 0);
-	applyUpRight(move.x, move.y, 0);
-	applyRight(move.x, move.y, 0);
-	applyDownRight(move.x, move.y, 0);
-	applyDown(move.x, move.y, 0);
-	applyDownLeft(move.x, move.y, 0);
-	applyLeft(move.x, move.y, 0);
+	state.board[move.y][move.x] = state.turn;
+	applyUpLeft(move.x-1, move.y-1);
+	applyUp(move.x, move.y-1);
+	applyUpRight(move.x+1, move.y-1);
+	applyRight(move.x+1, move.y);
+	applyDownRight(move.x+1, move.y+1);
+	applyDown(move.x, move.y+1);
+	applyDownLeft(move.x-1, move.y+1);
+	applyLeft(move.x-1, move.y);
 }
 
 /**
@@ -228,11 +230,11 @@ function applyMove (move){
   * @param {integer} depth - distance from calling location
   * @returns boolean of if flipped in direction
   */
-function applyUpLeft(x,y, depth){
+function applyUpLeft(x,y){
 	if(x < 0 || x > 7 || y < 0 || y > 7) return false;//ensures we're still on the board
-	if(depth > 0 && !state.board[y][x]) return false;
+	if(!state.board[y][x]) return false;
 	if(state.board[y][x] === state.turn) return true;
-	if (checkUpLeft(x-1,y-1, depth+1)){
+	if (applyUpLeft(x-1,y-1)){
 			state.board[y][x] = state.turn;
 			return true;
 		}
@@ -247,15 +249,15 @@ function applyUpLeft(x,y, depth){
   * @param {integer} depth - distance from calling location
   * @returns boolean of if flipped in direction
   */
-function applyUp(x,y, depth){
+function applyUp(x,y){
 	if(x < 0 || x > 7 || y < 0 || y > 7) return false;//ensures we're still on the board
-	if(depth > 0 && !state.board[y][x]) return false;
+	if(!state.board[y][x]) return false;
 	if(state.board[y][x] === state.turn) return true;
-	if (checkUpLeft(x,y-1, depth+1)){
+	if (applyUp(x,y-1)){
 			state.board[y][x] = state.turn;
 			return true;
 		}
-		return false;
+	return false;
 }
 
 /**
@@ -266,11 +268,11 @@ function applyUp(x,y, depth){
   * @param {integer} depth - distance from calling location
   * @returns boolean of if flipped in direction
   */
-function applyUpRight(x,y, depth){
+function applyUpRight(x,y){
 	if(x < 0 || x > 7 || y < 0 || y > 7) return false;//ensures we're still on the board
-	if(depth > 0 && !state.board[y][x]) return false;
+	if(!state.board[y][x]) return false;
 	if(state.board[y][x] === state.turn) return true;
-	if (checkUpLeft(x+1,y-1, depth+1)){
+	if (applyUpRight(x+1,y-1)){
 			state.board[y][x] = state.turn;
 			return true;
 		}
@@ -285,11 +287,11 @@ function applyUpRight(x,y, depth){
   * @param {integer} depth - distance from calling location
   * @returns boolean of if flipped in direction
   */
-function applyRight(x,y, depth){
+function applyRight(x,y){
 	if(x < 0 || x > 7 || y < 0 || y > 7) return false;//ensures we're still on the board
-	if(depth > 0 && !state.board[y][x]) return false;
+	if(!state.board[y][x]) return false;
 	if(state.board[y][x] === state.turn) return true;
-	if (checkUpLeft(x+1,y, depth+1)){
+	if (applyRight(x+1,y)){
 			state.board[y][x] = state.turn;
 			return true;
 		}
@@ -304,11 +306,11 @@ function applyRight(x,y, depth){
   * @param {integer} depth - distance from calling location
   * @returns boolean of if flipped in direction
   */
-function applyDownRight(x,y, depth){
+function applyDownRight(x,y){
 	if(x < 0 || x > 7 || y < 0 || y > 7) return false;//ensures we're still on the board
-	if(depth > 0 && !state.board[y][x]) return false;
+	if(!state.board[y][x]) return false;
 	if(state.board[y][x] === state.turn) return true;
-	if (checkUpLeft(x+1,y+1, depth+1)){
+	if (applyDownRight(x+1,y+1)){
 			state.board[y][x] = state.turn;
 			return true;
 		}
@@ -323,11 +325,11 @@ function applyDownRight(x,y, depth){
   * @param {integer} depth - distance from calling location
   * @returns boolean of if flipped in direction
   */
-function applyDown(x,y, depth){
+function applyDown(x,y){
 	if(x < 0 || x > 7 || y < 0 || y > 7) return false;//ensures we're still on the board
-	if(depth > 0 && !state.board[y][x]) return false;
+	if(!state.board[y][x]) return false;
 	if(state.board[y][x] === state.turn) return true;
-	if (checkUpLeft(x,y+1, depth+1)){
+	if (applyDown(x,y+1)){
 			state.board[y][x] = state.turn;
 			return true;
 		}
@@ -342,11 +344,11 @@ function applyDown(x,y, depth){
   * @param {integer} depth - distance from calling location
   * @returns boolean of if flipped in direction
   */
-function applyDownLeft(x,y, depth){
+function applyDownLeft(x,y){
 	if(x < 0 || x > 7 || y < 0 || y > 7) return false;//ensures we're still on the board
-	if(depth > 0 && !state.board[y][x]) return false;
+	if(!state.board[y][x]) return false;
 	if(state.board[y][x] === state.turn) return true;
-	if (checkUpLeft(x-1,y+1, depth+1)){
+	if (applyDownLeft(x-1,y+1)){
 			state.board[y][x] = state.turn;
 			return true;
 		}
@@ -361,15 +363,15 @@ function applyDownLeft(x,y, depth){
   * @param {integer} depth - distance from calling location
   * @returns boolean of if flipped in direction
   */
-function applyLeft(x,y, depth){
+function applyLeft(x,y){
 	if(x < 0 || x > 7 || y < 0 || y > 7) return false;//ensures we're still on the board
-	if(depth > 0 && !state.board[y][x]) return false;
+	if(!state.board[y][x]) return false;
 	if(state.board[y][x] === state.turn) return true;
-	if (checkUpLeft(x-1,y, depth+1)){
+	if (applyLeft(x-1,y)){
 			state.board[y][x] = state.turn;
 			return true;
 		}
-		return false;
+	return false;
 }
 
 /** @function nextTurn()
@@ -389,8 +391,9 @@ function updateBoard(){
 		for(var y = 0; y < state.board.length; y++){
 			for(var x = 0; x < state.board[y].length; x++){
 				if(state.board[y][x]) {
-					var square = getElementById("square-" + x + "-" + y)
-					square.removeChild(square.lastChild);
+					var square = document.getElementById("square-" + x + "-" + y)
+					if(square.children.length >0)
+						square.removeChild(square.lastChild);
 					var tile = document.createElement('div');
 					tile.classList.add('tile');
 					tile.classList.add('tile-' + state.board[y][x]);
@@ -405,10 +408,10 @@ function updateBoard(){
   * highlights the squares the player can place a tile in
   */
 function highlight(){
-	var moves = getLegalMoves();
-	console.log(moves.length);
+	var moves = state.bMoves;
+	//console.log(moves.length);
 	moves.forEach(function(move){
-		console.log(move.x+" "+move.y+" "+move.tiles+"\n");
+		//console.log(move.x+" "+move.y+" "+move.tiles+"\n");
 		var square = document.getElementById('square-' + move.x + '-' + move.y);
 		square.classList.add('highlight');
     })
@@ -430,25 +433,15 @@ function clearHighlights() {
 function handleSquareClick(event) {
   event.preventDefault();
   var squareId = event.target.id;
-  if(getElementById(squareId).hasAttribute('highlight')){
+  if(document.getElementById(squareId).classList.contains('highlight')){
 	var x = parseInt(squareId.charAt(7));
 	var y = parseInt(squareId.charAt(9));
+	state.bMoves.forEach(function(move){
+		if(move.x === x && move.y === y){
+			applyMove(move);
+		}
+	})
   }
-  
-  var piece = state.board[y][x];
-  // Make sure the checker is the player's
-  if(piece.charAt(0) !== state.turn) return;
-  // Get legal moves
-  var moves = getLegalMoves(state.board[y][x], x, y);
-  // mark checker to move
-  event.target.classList.add('highlight');
-  // Mark squares available for moves
-  moves.forEach(function(move){
-    if(move.type === 'slide') {
-      var square = document.getElementById('square-' + move.x + '-' + move.y);
-      square.classList.add('highlight');
-    }
-  })
 }
 
 
@@ -477,17 +470,22 @@ function handleSquareClick(event) {
 		}
 	} 
 }
-function main(){
-	setup();
-	while(!state.over){
-		if(state.turn === 'b'){
+
+function turn()
+{
+	if(state.turn === 'b'){
+		state.bMoves = getLegalMoves();
+		if(state.bMoves.length > 0){
 			highlight();
-			while(state.turn === 'b')
-			{
-				//waits for turn to end
-			}
+			//wait for user input???
+			updateState();
+			updateBoard();
 			clearHighlights();
+			state.bMoves = [];
+			nextTurn();
 		}
+		else nextTurn();
+	}
 		else {
 			var moves = getLegalMoves();
 			if (moves.length > 0){
@@ -504,6 +502,10 @@ function main(){
 			return;
 		}
 		else alert("The score is B: "+state.score.b+" to W: "+state.score.w);
-	}
 }
-//main();
+
+function main(){
+	setup();
+	turn();	
+}
+main();
