@@ -497,7 +497,7 @@ function compTurn()
 {
 	var moves = getLegalMoves();
 	if (moves.length > 0){
-		applyMove(moves.pop());
+		applyMove(moves[0]);
 		updateState();
 		updateBoard();
 		setTimeout(function(){alertUser()}, 500);
