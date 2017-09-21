@@ -404,14 +404,14 @@ function updateBoard(){
 		}	
 }
 
-function alertUser(){
+function updateScoreBoard(){
 	if(state.over){
-			if(state.score.w > state.score.b) alert("The Computer has won with a score of W: "+state.score.w+" to B: "+state.score.b);
-			else if(state.score.w < state.score.b) alert("You have won with a score of B: "+state.score.b+" to W: "+state.score.w);
-			else alert("There has been a tie with a score of B: "+state.score.b+" to W: "+state.score.w);
+			if(state.score.w > state.score.b) document.getElementById('score-board').innerHTML = "<p style='font-size:150%;font-family:verdana;text-align:center;'>The Computer has won with a score of W: "+state.score.w+" to B: "+state.score.b+"</p>";
+			else if(state.score.w < state.score.b) document.getElementById('score-board').innerHTML = "<p style='font-size:150%;font-family:verdana;text-align:center;'>You have won with a score of B: "+state.score.b+" to W: "+state.score.w+"</p>";
+			else document.getElementById('score-board').innerHTML = "There has been a tie with a score of B: "+state.score.b+" to W: "+state.score.w;
 			return;
 		}
-	else alert("The score is B: "+state.score.b+" to W: "+state.score.w);	
+	else document.getElementById('score-board').innerHTML = "<p style='font-size:150%;font-family:verdana;text-align:center;'>The score is B: "+state.score.b+" to W: "+state.score.w+"</p>";	
 }
 
 
@@ -451,7 +451,7 @@ function handleSquareClick(event) {
 			applyMove(move);
 			updateState();
 			updateBoard();
-			setTimeout(function(){alertUser()}, 500);
+			updateScoreBoard();
 			clearHighlights();
 			state.bMoves = [];
 			nextTurn();
@@ -469,6 +469,10 @@ function handleSquareClick(event) {
   * Sets up the game environment
   */
  function setup() {
+	var scoreBoard = document.createElement('section');
+	scoreBoard.id = 'score-board';
+	document.body.appendChild(scoreBoard);
+	scoreBoard.innerHTML = "<p style='font-size:150%;font-family:verdana;text-align:center;'>The score is B: "+state.score.b+" to W: "+state.score.w+"</p>";
 	var board = document.createElement('section');
 	board.id = 'game-board';
 	document.body.appendChild(board);
@@ -500,7 +504,7 @@ function compTurn()
 		applyMove(moves[0]);
 		updateState();
 		updateBoard();
-		setTimeout(function(){alertUser()}, 500);
+		updateScoreBoard();
 	}
 	nextTurn();
 	if(!state.over){

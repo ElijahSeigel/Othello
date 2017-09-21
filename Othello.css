@@ -1,4 +1,15 @@
 /* Othello.css */
+#score-board{
+  border: 1px solid black;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  text-align: center;
+  width: 820px;
+  height: 100px;
+	
+}
+
 #game-board {
   border: 1px solid black;
   display: flex;
