@@ -48,7 +48,7 @@ function updateState (){
 		}
 	}
 	state.score = {w: countW, b: countB};
-	if(countW+countB === 64){
+	if(countW+countB === 64 || countW === 0 || countB === 0){
 		state.over = true;
 	}
 }
@@ -110,7 +110,7 @@ function checkUp(x, y, depth){
 	if(x < 0 || x > 7 || y < 0 || y > 7) return 0;//ensures we're still on the board
 	if(!state.board[y][x]) return 0;
 	if(state.board[y][x] === state.turn) return depth;
-	return checkUpLeft(x,y-1, depth+1);	
+	return checkUp(x,y-1, depth+1);	
 }
 
 /**
@@ -125,7 +125,7 @@ function checkUpRight(x, y, depth){
 	if(x < 0 || x > 7 || y < 0 || y > 7) return 0;//ensures we're still on the board
 	if(!state.board[y][x]) return 0;
 	if(state.board[y][x] === state.turn) return depth;
-	return checkUpLeft(x+1,y-1, depth+1);	
+	return checkUpRight(x+1,y-1, depth+1);	
 }
 
 /**
@@ -140,7 +140,7 @@ function checkRight(x, y, depth){
 	if(x < 0 || x > 7 || y < 0 || y > 7) return 0;//ensures we're still on the board
 	if(!state.board[y][x]) return 0;
 	if(state.board[y][x] === state.turn) return depth;
-	return checkUpLeft(x+1,y, depth+1);	
+	return checkRight(x+1,y, depth+1);	
 }
 
 /**
@@ -155,7 +155,7 @@ function checkDownRight(x, y, depth){
 	if(x < 0 || x > 7 || y < 0 || y > 7) return 0;//ensures we're still on the board
 	if(!state.board[y][x]) return 0;
 	if(state.board[y][x] === state.turn) return depth;
-	return checkUpLeft(x+1,y+1, depth+1);	
+	return checkDownRight(x+1,y+1, depth+1);	
 }
 
 /**
@@ -170,7 +170,7 @@ function checkDown(x, y, depth){
 	if(x < 0 || x > 7 || y < 0 || y > 7) return 0;//ensures we're still on the board
 	if(!state.board[y][x]) return 0;
 	if(state.board[y][x] === state.turn) return depth;
-	return checkUpLeft(x,y+1, depth+1);	
+	return checkDown(x,y+1, depth+1);	
 }
 
 /**
@@ -185,7 +185,7 @@ function checkDownLeft(x, y, depth){
 	if(x < 0 || x > 7 || y < 0 || y > 7) return 0;//ensures we're still on the board
 	if(!state.board[y][x]) return 0;
 	if(state.board[y][x] === state.turn) return depth;
-	return checkUpLeft(x-1,y+1, depth+1);	
+	return checkDownLeft(x-1,y+1, depth+1);	
 }
 
 /**
@@ -200,7 +200,7 @@ function checkLeft(x, y, depth){
 	if(x < 0 || x > 7 || y < 0 || y > 7) return 0;//ensures we're still on the board
 	if(!state.board[y][x]) return 0;
 	if(state.board[y][x] === state.turn) return depth;
-	return checkUpLeft(x-1,y, depth+1);	
+	return checkLeft(x-1,y, depth+1);	
 }
 
 
@@ -380,6 +380,7 @@ function applyLeft(x,y){
 function nextTurn() {
   if(state.turn === 'b') state.turn = 'w';
   else state.turn = 'b';
+
 }
 
 /**
@@ -403,15 +404,24 @@ function updateBoard(){
 		}	
 }
 
+function alertUser(){
+	if(state.over){
+			if(state.score.w > state.score.b) alert("The Computer has won with a score of W: "+state.score.w+" to B: "+state.score.b);
+			else if(state.score.w < state.score.b) alert("You have won with a score of B: "+state.score.b+" to W: "+state.score.w);
+			else alert("There has been a tie with a score of B: "+state.score.b+" to W: "+state.score.w);
+			return;
+		}
+	else alert("The score is B: "+state.score.b+" to W: "+state.score.w);	
+}
+
+
 /**
   * @function highlight
   * highlights the squares the player can place a tile in
   */
 function highlight(){
 	var moves = state.bMoves;
-	//console.log(moves.length);
 	moves.forEach(function(move){
-		//console.log(move.x+" "+move.y+" "+move.tiles+"\n");
 		var square = document.getElementById('square-' + move.x + '-' + move.y);
 		square.classList.add('highlight');
     })
@@ -439,6 +449,15 @@ function handleSquareClick(event) {
 	state.bMoves.forEach(function(move){
 		if(move.x === x && move.y === y){
 			applyMove(move);
+			updateState();
+			updateBoard();
+			setTimeout(function(){alertUser()}, 500);
+			clearHighlights();
+			state.bMoves = [];
+			nextTurn();
+			if(!state.over){
+				setTimeout(function(){compTurn()}, 2000);
+			}
 		}
 	})
   }
@@ -469,43 +488,31 @@ function handleSquareClick(event) {
 		  }
 		}
 	} 
+	//prep for first turn
+	state.bMoves = getLegalMoves();
+	highlight();
 }
-
-function turn()
+setup();
+function compTurn()
 {
-	if(state.turn === 'b'){
+	var moves = getLegalMoves();
+	if (moves.length > 0){
+		applyMove(moves.pop());
+		updateState();
+		updateBoard();
+		setTimeout(function(){alertUser()}, 500);
+	}
+	nextTurn();
+	if(!state.over){
 		state.bMoves = getLegalMoves();
 		if(state.bMoves.length > 0){
-			highlight();
-			//wait for user input???
-			updateState();
-			updateBoard();
-			clearHighlights();
-			state.bMoves = [];
-			nextTurn();
+		highlight();
 		}
-		else nextTurn();
+		else{
+			nextTurn();
+			compTurn();
+		}
 	}
-		else {
-			var moves = getLegalMoves();
-			if (moves.length > 0){
-				applyMove(moves.pop());
-				updateState();
-				updateBoard();
-			}
-			nextTurn();
-		}
-		if(state.over){
-			if(state.score.w > state.score.b) alert("The Computer has won with a score of W: "+state.score.w+" to B: "+state.score.b);
-			else if(state.score.w > state.score.b) alert("You have won with a score of B: "+state.score.b+" to W: "+state.score.w);
-			else alert("There has been a tie with a score of B: "+state.score.b+" to W: "+state.score.w);
-			return;
-		}
-		else alert("The score is B: "+state.score.b+" to W: "+state.score.w);
-}
 
-function main(){
-	setup();
-	turn();	
+
 }
-main();
